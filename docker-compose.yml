@@ -1,0 +1,33 @@
+version: '2'
+
+services:
+  https-server:
+    image: 'httpd:2.4.38'
+    ports:
+      - '8000:80'
+      - '443:443'
+    volumes:
+      - "$PWD/netboot:/usr/local/apache2/htdocs"
+      - "$PWD/server.crt:/usr/local/apache2/conf/server.crt:ro"
+      - "$PWD/server.key:/usr/local/apache2/conf/server.key:ro"
+      - "$PWD/httpd.conf:/usr/local/apache2/conf/httpd.conf"
+
+  nfs-server:
+    image: "erichough/nfs-server:2.1.0"
+    container_name: "nfs-server"
+    cap_add:
+      - SYS_ADMIN
+    ports:
+      - "2049:2049"
+      - "2049:2049/udp"
+      - "111:111"
+      - "111:111/udp"
+      - "32765:32765"
+      - "32765:32765/udp"
+      - "32767:32767"
+      - "32767:32767/udp"
+    volumes:
+      - "$PWD/exports.txt:/etc/exports:ro"
+      - "$PWD/nfs-export:/srv/nfs"
+    environment:
+      NFS_VERSION: 4.2
